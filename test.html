@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main">
+      <div class="flex-item data">
+        <textarea id="text" rows="30" placeholder="请输入表格数据，例(a:111 b:333)"></textarea>
+        <button onclick="reset()" id="reset">reset</button>
+      </div>
+      <div class="flex-item html">
+        <div class="html-container"></div>
+        <button class="html-copy">copy</button>
+      </div>
+      <div class="flex-item table"></div>
+    </div>
+  </body>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .main {
+      width: 100%;
+
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .flex-item {
+      position: relative;
+      display: flex;
+      height: 500px;
+      overflow: auto;
+      flex: 1;
+      flex-direction: column;
+      border: 1px solid #bbb;
+    }
+    .flex-item button {
+      height: 40px;
+      font-size: 18px;
+    }
+
+    #text {
+      flex: 1;
+      resize: none;
+    }
+    .html-container {
+      height: calc(100% - 40px);
+      overflow: auto;
+    }
+    .html-copy {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+    table {
+      flex: 1;
+      border: 1px solid #bbb;
+      border-spacing: 0px;
+    }
+
+    /* @media screen and (min-width: 776px) {
+      table {
+        min-width: 500px;
+      }
+    } */
+    .product_desc_details_table th {
+      width: 30%;
+      border-spacing: 0px;
+      border-bottom: 1px solid #cccccc;
+      border-right: 1px solid #cccccc;
+      padding: 10px 10px 10px 10px;
+      text-align: left;
+    }
+    .product_desc_details_table td {
+      border-spacing: 0px;
+      border-bottom: 1px solid #cccccc;
+      padding: 10px 10px 10px 10px;
+      text-align: left;
+    }
+    tr:last-child > th,
+    tr:last-child > td {
+      border-bottom: none !important;
+    }
+    tr:nth-child(2n + 1) > th,
+    tr:nth-child(2n + 1) > td {
+      background-color: #eee;
+    }
+  </style>
+  <script>
+    function reset() {
+      const dataInput = document.querySelector("#text");
+      const htmlContainer = document.querySelector(".html-container");
+      const table = document.querySelector(".flex-item.table");
+      dataInput.value = "";
+      htmlContainer.innerText = "";
+      table.innerHTML = null;
+    }
+    function parseHTMLtable(data) {
+      if (!data.trim()) {
+        reset();
+        return;
+      }
+      const table = document.createElement("table");
+      const viewHtml = document.querySelector(".html-container");
+      const viewTable = document.querySelector(".flex-item.table");
+      table.classList.add("product_desc_details_table");
+      let datatable = "";
+      const no_blank_data = data
+        .trim()
+        .split("\n")
+        .filter((el) => !!el);
+      no_blank_data.forEach((el, index) => {
+        if (/:/g.test(el)) {
+          const key = el.split(":")[0];
+          const value = el.split(":")[1];
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<th>${key}</th><td>${value}</td>`;
+          datatable =
+            datatable + `  <tr><th>${key}</th><td>${value}</td></tr>${index === no_blank_data.length - 1 ? "" : "\n"}`;
+          table.appendChild(tr);
+        }
+      });
+      if (viewTable.childNodes.length === 0) {
+        viewTable.appendChild(table);
+      } else {
+        viewTable.children[0].innerHTML = table.innerHTML;
+      }
+
+      datatable = `<table class="product_desc_details_table">
+${datatable}
+</table>
+      `;
+
+      viewHtml.innerText = datatable;
+    }
+    document.querySelector("#text").addEventListener("input", (e) => {
+      parseHTMLtable(e.target.value);
+    });
+    document.querySelector(".html-copy").addEventListener("click", async (e) => {
+      const htmlContainer = document.querySelector(".html-container");
+      if (htmlContainer.innerText) {
+        await navigator.clipboard.writeText(htmlContainer.innerText);
+      }
+    });
+  </script>
+</html>
