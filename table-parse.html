@@ -123,8 +123,9 @@
         .filter((el) => !!el);
       no_blank_data.forEach((el, index) => {
         if (/:/g.test(el)) {
-          const key = el.split(":")[0];
-          const value = el.split(":")[1];
+          const group = el.split(":");
+          const key = group[0];
+          const value = group.length > 2 ? group.slice(1).join(":") : group[1];
           const tr = document.createElement("tr");
           tr.innerHTML = `<th>${key}</th><td>${value}</td>`;
           datatable =
